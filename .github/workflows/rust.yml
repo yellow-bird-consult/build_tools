@@ -1,303 +1,118 @@
-# Main CI pipeline to validate PRs.
-#
-# CI pipeline based on:
-# - https://github.com/heim-rs/heim/blob/master/.github/workflows/ci.yml
-# - https://github.com/BurntSushi/ripgrep/blob/master/.github/workflows/ci.yml
-# - https://www.reillywood.com/blog/rust-faster-ci/
-#
-# CI pipeline should do:
-# - cargo fmt on supported platforms
-# - cargo test on supported platforms, cargo check on unsupported
-# - cargo clippy after (apparently faster) on supported platforms
-
-name: ci
+# Instruction + template repo: https://github.com/FedericoPonzi/rust-ci
+name: CI
 
 on:
-  workflow_dispatch:
   pull_request:
   push:
     branches:
       - master
-
-env:
-  CARGO_INCREMENTAL: 0
-  CARGO_PROFILE_DEV_DEBUG: 0
-  CARGO_HUSKY_DONT_INSTALL_HOOKS: true
+    tags:
+      - 'v*.*.*'
 
 jobs:
-  # Runs rustfmt + tests + clippy on the main supported platforms.
-  supported:
-    runs-on: ${{ matrix.info.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        info:
-          - {
-              os: "ubuntu-latest",
-              target: "x86_64-unknown-linux-gnu",
-              cross: false,
-            }
-          - {
-              os: "ubuntu-latest",
-              target: "aarch64-unknown-linux-gnu",
-              cross: true,
-            }
-          - { os: "macOS-latest", target: "x86_64-apple-darwin", cross: false }
-          - {
-              os: "windows-2019",
-              target: "x86_64-pc-windows-msvc",
-              cross: false,
-            }
-        features: [
-            "--all-features",
-            # "--features battery",
-            # "--features gpu",
-            "--no-default-features",
-          ]
+  style:
+    name: Check Style
+    runs-on: ubuntu-latest
     steps:
-      - name: Check if this action should be skipped
-        id: skip_check
-        uses: fkirc/skip-duplicate-actions@38c3738dcac87b41e2b7038775457756c793566e # https://github.com/fkirc/skip-duplicate-actions/commit/38c3738dcac87b41e2b7038775457756c793566e
-        with:
-          concurrent_skipping: "same_content_newer"
-          skip_after_successful_duplicate: "true"
-          paths: '[".cargo/**", ".github/workflows/ci.yml", "sample_configs/**", "src/**", "tests/**", "build.rs", "Cargo.lock", "Cargo.toml", "clippy.toml", "rustfmt.toml"]'
-          do_not_skip: '["workflow_dispatch", "push"]'
+      - name: Checkout
+        uses: actions/checkout@v1
 
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
-
-      - name: Set up Rust toolchain
-        if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
-        uses: dtolnay/rust-toolchain@88e7c2e1da2693cf72d58fce9416206818e61dea # https://github.com/dtolnay/rust-toolchain/commit/88e7c2e1da2693cf72d58fce9416206818e61dea
+      - name: Install rust
+        uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-          components: rustfmt, clippy
-          target: ${{ matrix.info.target }}
+          components: rustfmt
+          profile: minimal
+          override: true
 
-      - name: Enable Rust cache
-        if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
-        uses: Swatinem/rust-cache@cb2cf0cc7c5198d3364b9630e2c3d457f160790c # 1.4.0
-
-      - name: Check cargo fmt
-        if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
-        run: cargo fmt --all -- --check
-
-      - name: Install cross if needed
-        if: matrix.info.cross == true
-        run: |
-          cargo install cross --locked --version=0.2.4
-      - name: Build tests
-        if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
+      - name: cargo fmt -- --check
         uses: actions-rs/cargo@v1
         with:
-          command: test
-          args: --no-run --locked ${{ matrix.features }} --target=${{ matrix.info.target }}
-          use-cross: ${{ matrix.info.cross }}
-        env:
-          RUST_BACKTRACE: full
+          command: fmt
+          args: --all -- --check
 
-      - name: Run tests
-        if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --no-fail-fast ${{ matrix.features }} --target=${{ matrix.info.target }} -- --nocapture --quiet
-          use-cross: ${{ matrix.info.cross }}
-        env:
-          RUST_BACKTRACE: full
 
-      - name: Run clippy
-        if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: ${{ matrix.features }} --all-targets --workspace --target=${{ matrix.info.target }} -- -D warnings
-          use-cross: ${{ matrix.info.cross }}
-        env:
-          RUST_BACKTRACE: full
+  test:
+    name: Test
+    needs: [style]
+    runs-on: ubuntu-latest
 
-  # Run cargo check on all other platforms
-  other_check:
-    runs-on: ${{ matrix.info.os }}
-    continue-on-error: true
     strategy:
-      fail-fast: false
       matrix:
-        info:
-          # x86 or x64
-          # - {
-          #     os: "ubuntu-latest",
-          #     target: "i686-unknown-linux-gnu",
-          #     cross: true,
-          #     rust: stable,
-          #   }
-          # - {
-          #     os: "ubuntu-latest",
-          #     target: "x86_64-unknown-linux-musl",
-          #     cross: false,
-          #     rust: stable,
-          #   }
-          - {
-              os: "ubuntu-latest",
-              target: "i686-unknown-linux-musl",
-              cross: true,
-              rust: stable,
-            }
-          - {
-              os: "windows-2019",
-              target: "i686-pc-windows-msvc",
-              cross: false,
-              rust: stable,
-            }
-          # - {
-          #     os: "windows-2019",
-          #     target: "x86_64-pc-windows-gnu",
-          #     cross: false,
-          #     rust: stable,
-          #   }
-
-          # Beta; should be allowed to fail.
-          # - {
-          #     os: "ubuntu-latest",
-          #     target: "x86_64-unknown-linux-gnu",
-          #     cross: false,
-          #     rust: beta,
-          #   }
-          # - {
-          #     os: "macOS-latest",
-          #     target: "x86_64-apple-darwin",
-          #     cross: false,
-          #     rust: beta,
-          #   }
-          # - {
-          #     os: "windows-2019",
-          #     target: "x86_64-pc-windows-msvc",
-          #     cross: false,
-          #     rust: beta,
-          #   }
-
-          # armv7
-          - {
-              os: "ubuntu-latest",
-              target: "armv7-unknown-linux-gnueabihf",
-              cross: true,
-              rust: stable,
-            }
-
-          # armv6
-          # - {
-          #     os: "ubuntu-latest",
-          #     target: "arm-unknown-linux-gnueabihf",
-          #     cross: true,
-          #     rust: stable,
-          #   }
-
-          # PowerPC 64 LE
-          - {
-              os: "ubuntu-latest",
-              target: "powerpc64le-unknown-linux-gnu",
-              cross: true,
-              rust: stable,
-            }
-
-          # Risc-V 64gc
-          - {
-              os: "ubuntu-latest",
-              target: "riscv64gc-unknown-linux-gnu",
-              cross: true,
-              rust: stable,
-            }
-
-          # macOS ARM
-          - {
-              os: "macOS-latest",
-              target: "aarch64-apple-darwin",
-              cross: true,
-              rust: stable,
-            }
+        build: [stable, beta, nightly]
+        include:
+          - build: beta
+            rust: beta
+          - build: nightly
+            rust: nightly
+            benches: true
 
     steps:
-      - name: Check if this action should be skipped
-        id: skip_check
-        uses: fkirc/skip-duplicate-actions@38c3738dcac87b41e2b7038775457756c793566e # https://github.com/fkirc/skip-duplicate-actions/commit/38c3738dcac87b41e2b7038775457756c793566e
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Install rust
+        uses: actions-rs/toolchain@v1
         with:
-          concurrent_skipping: "same_content_newer"
-          skip_after_successful_duplicate: "true"
-          paths: '[".cargo/**", ".github/workflows/ci.yml", "sample_configs/**", "src/**", "tests/**", "build.rs", "Cargo.lock", "Cargo.toml", "clippy.toml", "rustfmt.toml"]'
-          do_not_skip: '["workflow_dispatch", "push"]'
+          toolchain: ${{ matrix.rust || 'stable' }}
+          profile: minimal
+          override: true
 
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
-
-      - name: Set up Rust toolchain
-        if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
-        uses: dtolnay/rust-toolchain@88e7c2e1da2693cf72d58fce9416206818e61dea # https://github.com/dtolnay/rust-toolchain/commit/88e7c2e1da2693cf72d58fce9416206818e61dea
-        with:
-          toolchain: ${{ matrix.info.rust }}
-          target: ${{ matrix.info.target }}
-
-      - name: Enable Rust cache
-        uses: Swatinem/rust-cache@cb2cf0cc7c5198d3364b9630e2c3d457f160790c # 1.4.0
-        if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
-        with:
-          key: ${{ matrix.info.target }}
-
-      - name: Install cross if needed
-        if: matrix.info.cross == true
-        run: |
-          cargo install cross --locked --version=0.2.4
-      - name: Check
-        if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
+      - name: Build debug
         uses: actions-rs/cargo@v1
         with:
-          command: check
-          args: --all-targets --verbose --target=${{ matrix.info.target }} --locked
-          use-cross: ${{ matrix.info.cross }}
-      - name: build
-        run: make build
-      - name: version
-        run: echo "::set-output name=version::$(./bin/azblogfilter --version)"
-        id: version
-      - name: release
-        uses: actions/create-release@v1
-        id: create_release
+          command: build
+          args: ${{ matrix.features }}
+
+      - name: Test
+        uses: actions-rs/cargo@v1
         with:
-          draft: false
-          prerelease: false
-          release_name: ${{ steps.version.outputs.version }}
-          tag_name: ${{ github.ref }}
-          body_path: CHANGELOG.md
+          command: test
+          args: ${{ matrix.features }}
+
+      - name: Test all benches
+        if: matrix.benches
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --benches ${{ matrix.features }}
+  deploy:
+    name: deploy
+    needs: [test]
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    strategy: 
+      matrix:
+        target: [ aarch64-unknown-linux-gnu, armv7-unknown-linux-gnueabihf, i686-unknown-linux-gnu, i686-unknown-linux-musl, mips-unknown-linux-gnu, mips64-unknown-linux-gnuabi64, mips64el-unknown-linux-gnuabi64, mipsel-unknown-linux-gnu, powerpc-unknown-linux-gnu, powerpc64-unknown-linux-gnu, powerpc64le-unknown-linux-gnu,           arm-unknown-linux-gnueabi          ,x86_64-unknown-linux-gnu           ,x86_64-unknown-linux-musl]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+          target: ${{ matrix.target }}
+
+      - name: Build target
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --release --target ${{ matrix.target }}
+
+      - name: Package
+        shell: bash
+        run: |
+          #strip target/${{ matrix.target }}/release/testmest
+          cd target/${{ matrix.target }}/release          
+          tar czvf ../../../testmest-${{ matrix.target }}.tar.gz testmest
+          cd -
+      - name: Publish
+        uses: softprops/action-gh-release@v1
+        # TODO: if any of the build step fails, the release should be deleted.
+        with:
+            files: 'testmest*'
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-      - name: build artifacts
-        run: make build-linux && make build-windows && make build-darwin
-      - name: upload linux artifact
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./bin/azblogfilter.linux-amd64.tar.gz
-          asset_name: azblogfilter.linux-amd64.tar.gz
-          asset_content_type: application/gzip
-      - name: upload darwin artifact
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./bin/azblogfilter.darwin-amd64.tar.gz
-          asset_name: azblogfilter.darwin-amd64.tar.gz
-          asset_content_type: application/gzip
-      - name: upload windows artifact
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./bin/azblogfilter.windows-amd64.zip
-          asset_name: azblogfilter.windows-amd64.zip
-          asset_content_type: application/zip
