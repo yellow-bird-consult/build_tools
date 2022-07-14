@@ -21,6 +21,8 @@ jobs:
           - target: aarch64-apple-darwin
             archive: zip
     steps:
+      - name: Rust Release binary
+        uses: rust-build/rust-build.action@v1.3.2
       - uses: actions/checkout@master
       - name: Compile and release
         uses: rust-build/rust-build.action@v1.3.2
