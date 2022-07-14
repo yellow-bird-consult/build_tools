@@ -127,18 +127,18 @@ jobs:
       matrix:
         info:
           # x86 or x64
-          - {
-              os: "ubuntu-latest",
-              target: "i686-unknown-linux-gnu",
-              cross: true,
-              rust: stable,
-            }
-          - {
-              os: "ubuntu-latest",
-              target: "x86_64-unknown-linux-musl",
-              cross: false,
-              rust: stable,
-            }
+          # - {
+          #     os: "ubuntu-latest",
+          #     target: "i686-unknown-linux-gnu",
+          #     cross: true,
+          #     rust: stable,
+          #   }
+          # - {
+          #     os: "ubuntu-latest",
+          #     target: "x86_64-unknown-linux-musl",
+          #     cross: false,
+          #     rust: stable,
+          #   }
           - {
               os: "ubuntu-latest",
               target: "i686-unknown-linux-musl",
@@ -151,32 +151,32 @@ jobs:
               cross: false,
               rust: stable,
             }
-          - {
-              os: "windows-2019",
-              target: "x86_64-pc-windows-gnu",
-              cross: false,
-              rust: stable,
-            }
+          # - {
+          #     os: "windows-2019",
+          #     target: "x86_64-pc-windows-gnu",
+          #     cross: false,
+          #     rust: stable,
+          #   }
 
           # Beta; should be allowed to fail.
-          - {
-              os: "ubuntu-latest",
-              target: "x86_64-unknown-linux-gnu",
-              cross: false,
-              rust: beta,
-            }
-          - {
-              os: "macOS-latest",
-              target: "x86_64-apple-darwin",
-              cross: false,
-              rust: beta,
-            }
-          - {
-              os: "windows-2019",
-              target: "x86_64-pc-windows-msvc",
-              cross: false,
-              rust: beta,
-            }
+          # - {
+          #     os: "ubuntu-latest",
+          #     target: "x86_64-unknown-linux-gnu",
+          #     cross: false,
+          #     rust: beta,
+          #   }
+          # - {
+          #     os: "macOS-latest",
+          #     target: "x86_64-apple-darwin",
+          #     cross: false,
+          #     rust: beta,
+          #   }
+          # - {
+          #     os: "windows-2019",
+          #     target: "x86_64-pc-windows-msvc",
+          #     cross: false,
+          #     rust: beta,
+          #   }
 
           # armv7
           - {
@@ -187,12 +187,12 @@ jobs:
             }
 
           # armv6
-          - {
-              os: "ubuntu-latest",
-              target: "arm-unknown-linux-gnueabihf",
-              cross: true,
-              rust: stable,
-            }
+          # - {
+          #     os: "ubuntu-latest",
+          #     target: "arm-unknown-linux-gnueabihf",
+          #     cross: true,
+          #     rust: stable,
+          #   }
 
           # PowerPC 64 LE
           - {
