@@ -15,9 +15,9 @@ fi
 # make yb_tools in root if not there
 if [ -d "./yb_tools" ] 
 then
-    echo "yb_tools does exist... creating" 
+    echo "yb_tools already exists... updating" 
 else
-    echo "yb_tools already exists... updating"
+    echo "yb_tools does not exist... creating"
     mkdir yb_tools
 fi
 
