@@ -13,12 +13,12 @@ else
 fi
 
 # make yb_tools in root if not there
-if [ -d "./yb_tools" ] 
+if [ -d "~/yb_tools" ] 
 then
     echo "yb_tools already exists... updating" 
 else
     echo "yb_tools does not exist... creating"
-    mkdir yb_tools
+    mkdir ~/yb_tools
 fi
 
 cd yb_tools
@@ -40,7 +40,7 @@ else
 fi
 
 # delete existing static binary
-if [ -d "./build_tool" ]
+if [ -d "~/yb_tools/build_tool" ]
 then
     rm ./build_tool
 fi
@@ -49,15 +49,15 @@ fi
 if [ $PLATFORM == "M1" ]
 then
     wget https://github.com/yellow-bird-consult/build_tools/raw/develop/releases/build_tools_aarch64_apple_darwin
-    mv build_tools_aarch64_apple_darwin build_tool
+    mv build_tools_aarch64_apple_darwin ~/yb_tools/build_tool
 elif [ $PLATFORM == "Linux" ]
 then
     wget https://github.com/yellow-bird-consult/build_tools/raw/develop/releases/build_tools_x86_64_unknown_linux_musl
-    mv build_tools_x86_64_unknown_linux_musl build_tool
+    mv build_tools_x86_64_unknown_linux_musl ~/yb_tools/build_tool
 fi
 
 # update the permissions of the static binary
-chmod 755 ./build_tool
+chmod 755 ~/yb_tools/build_tool
 
 echo ""
 echo ""
