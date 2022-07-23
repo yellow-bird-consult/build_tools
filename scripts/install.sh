@@ -59,9 +59,14 @@ fi
 # update the permissions of the static binary
 chmod 755 ./build_tool
 
-echo "\n\n\n\nYellow Bird build tools have been installed"
+echo ""
+echo ""
+echo "Yellow Bird build tools have been installed"
 echo "please add the following alias to your profile:"
-echo "\n\nalias ybb='~/yb_tools/./build_tool'\n\n"
+echo ""
+echo "alias ybb='~/yb_tools/./build_tool'"
+echo ""
+echo ""
 
 # configure the alias for the terminal
 # if alias ybb 2>/dev/null; 
