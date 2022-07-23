@@ -1,57 +1,57 @@
-# Instruction + template repo: https://github.com/FedericoPonzi/rust-ci
-name: CI
+# # Instruction + template repo: https://github.com/FedericoPonzi/rust-ci
+# name: CI
 
-on:
-  pull_request:
-  push:
-    branches:
-      - master
-    tags:
-      - 'v*.*.*'
+# on:
+#   pull_request:
+#   push:
+#     branches:
+#       - master
+#     tags:
+#       - 'v*.*.*'
 
-jobs:
+# jobs:
 
-  install-cross:
-    name: install-cross
-    runs-on: ubuntu-latest
-    steps:
-      - name
+#   install-cross:
+#     name: install-cross
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name
 
-  deploy:
-    name: deploy
-    runs-on: ubuntu-latest
-    strategy: 
-      matrix:
-        target: [ x86_64-unknown-linux-musl, aarch64-apple-darwin ]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-      - name: Install rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          override: true
-          target: ${{ matrix.target }}
+#   deploy:
+#     name: deploy
+#     runs-on: ubuntu-latest
+#     strategy: 
+#       matrix:
+#         target: [ x86_64-unknown-linux-musl, aarch64-apple-darwin ]
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v1
+#       - name: Install rust
+#         uses: actions-rs/toolchain@v1
+#         with:
+#           toolchain: stable
+#           profile: minimal
+#           override: true
+#           target: ${{ matrix.target }}
 
-      - name: Build target
-        uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: build
-          args: --release --target ${{ matrix.target }}
+#       - name: Build target
+#         uses: actions-rs/cargo@v1
+#         with:
+#           use-cross: true
+#           command: build
+#           args: --release --target ${{ matrix.target }}
 
-      - name: Package
-        shell: bash
-        run: |
-          #strip target/${{ matrix.target }}/release/testmest
-          cd target/${{ matrix.target }}/release          
-          tar czvf ../../../testmest-${{ matrix.target }}.tar.gz testmest
-          cd -
-      - name: Publish
-        uses: softprops/action-gh-release@v1
-        # TODO: if any of the build step fails, the release should be deleted.
-        with:
-            files: 'testmest*'
-        env:
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+#       - name: Package
+#         shell: bash
+#         run: |
+#           #strip target/${{ matrix.target }}/release/testmest
+#           cd target/${{ matrix.target }}/release          
+#           tar czvf ../../../testmest-${{ matrix.target }}.tar.gz testmest
+#           cd -
+#       - name: Publish
+#         uses: softprops/action-gh-release@v1
+#         # TODO: if any of the build step fails, the release should be deleted.
+#         with:
+#             files: 'testmest*'
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
