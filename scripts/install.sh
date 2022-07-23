@@ -51,6 +51,7 @@ then
     wget https://github.com/yellow-bird-consult/build_tools/raw/develop/releases/build_tools_aarch64_apple_darwin
     mv build_tools_aarch64_apple_darwin build_tool
 elif [ $PLATFORM == "Linux" ]
+then
     https://github.com/yellow-bird-consult/build_tools/raw/develop/releases/build_tools_x86_64_unknown_linux_musl
     mv build_tools_x86_64_unknown_linux_musl build_tool
 fi
