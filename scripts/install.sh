@@ -84,12 +84,12 @@ then
     fi
 
     # adding route to ingress alias
-    if grep -R "alias tyb='sh ~/yb_tools/ingress.sh'" ~/.zshrc
+    if grep -R "alias yb='sh ~/yb_tools/ingress.sh'" ~/.zshrc
     then
         echo "yb command already exists in ~/.zshrc"
     else
         echo "yb command does not exist... adding to ~/.zshrc"
-        echo "alias tyb='sh ~/yb_tools/ingress.sh'" >> ~/.zshrc
+        echo "alias yb='sh ~/yb_tools/ingress.sh'" >> ~/.zshrc
     fi 
 fi
 
@@ -105,12 +105,12 @@ then
     fi
 
     # adding route to ingress alias
-    if grep -R "alias tyb='sh ~/yb_tools/ingress.sh'" ~/.bashrc
+    if grep -R "alias yb='sh ~/yb_tools/ingress.sh'" ~/.bashrc
     then
         echo "yb command already exists in ~/.bashrc"
     else
         echo "yb command does not exist... adding to ~/.bashrc"
-        echo "alias tyb='sh ~/yb_tools/ingress.sh'" >> ~/.bashrc
+        echo "alias yb='sh ~/yb_tools/ingress.sh'" >> ~/.bashrc
     fi 
 fi
 
@@ -126,11 +126,11 @@ then
     fi
 
     # adding route to ingress alias
-    if grep -R "alias tyb='sh ~/yb_tools/ingress.sh'" ~/.profile
+    if grep -R "alias yb='sh ~/yb_tools/ingress.sh'" ~/.profile
     then
         echo "yb command already exists in ~/.profile"
     else
         echo "yb command does not exist... adding to ~/.profile"
-        echo "alias tyb='sh ~/yb_tools/ingress.sh'" >> ~/.profile
+        echo "alias yb='sh ~/yb_tools/ingress.sh'" >> ~/.profile
     fi  
 fi
