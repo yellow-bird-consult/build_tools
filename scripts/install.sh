@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 # work out the platform this is running on
-if [ "$(uname)" == "Darwin" ] && [ "$(uname -m)" == "arm64" ]
+if [ "$(uname)" = "Darwin" ] && [ "$(uname -m)" = "arm64" ]
 then
     echo "Apple M1 detected"
     PLATFORM="M1"
-elif [ "$(uname)" == "Darwin" ] && [ "$(uname -m)" == "x86_64" ]
+elif [ "$(uname)" = "Darwin" ] && [ "$(uname -m)" = "x86_64" ]
 then
     echo "Apple Intel detected"
     PLATFORM="AppleIntel"
@@ -23,24 +23,6 @@ else
     mkdir ~/yb_tools
 fi
 
-# cd yb_tools
-
-# install wget if not installed
-if which wget >/dev/null ; 
-then
-    echo "wget is installed"
-else
-    echo "wget is not installed... installing"
-    if [ $PLATFORM == "M1" ]
-    then
-        brew install wget
-    elif [ $PLATFORM == "Linux" ]
-    then
-        apt-get update
-        apt-get install wget
-    fi
-fi
-
 # delete existing static binary
 if [ -f ~/yb_tools/build_tool ]
 then
@@ -49,53 +31,106 @@ then
 fi
 
 # pull static binary
-if [ $PLATFORM == "M1" ]
+if [ $PLATFORM = "M1" ]
 then
     wget https://github.com/yellow-bird-consult/build_tools/raw/develop/releases/build_tools_aarch64_apple_darwin
     mv build_tools_aarch64_apple_darwin ~/yb_tools/build_tool
-elif [ $PLATFORM == "Linux" ]
+elif [ $PLATFORM = "Linux" ]
 then
     wget https://github.com/yellow-bird-consult/build_tools/raw/develop/releases/build_tools_x86_64_unknown_linux_musl
     mv build_tools_x86_64_unknown_linux_musl ~/yb_tools/build_tool
-elif [ $PLATFORM == "AppleIntel" ]
+elif [ $PLATFORM = "AppleIntel" ]
 then
     wget https://github.com/yellow-bird-consult/build_tools/raw/develop/releases/build_tools_x86_64_apple_darwin
     mv build_tools_x86_64_apple_darwin ~/yb_tools/build_tool
 fi
 echo "new build tool installed"
 
+# delete existing bash modules
+if [ -f ~/yb_tools/ingress.sh ]
+then
+    rm ~/yb_tools/ingress.sh
+    echo "existing ingress bash module deleted"
+fi
+if [ -f ~/yb_tools/database.sh ]
+then
+    rm ~/yb_tools/database.sh
+    echo "existing database bash module deleted"
+fi  
+
+# pull bash ingress and modules
+wget https://github.com/yellow-bird-consult/build_tools/raw/develop/modules/ingress.sh
+wget https://github.com/yellow-bird-consult/build_tools/raw/develop/modules/database.sh
+
+# move bash ingress and modules to yb_tools
+mv ingress.sh ~/yb_tools/ingress.sh
+mv database.sh ~/yb_tools/database.sh
+echo "ingress bash module installed"
+echo "database bash module installed"
+
 # update the permissions of the static binary
 chmod 755 ~/yb_tools/build_tool
 
+# add alias to profiles if not present
 if [ -f ~/.zshrc ] 
 then 
+    # adding direct build alias
     if grep -R "alias ybb='~/yb_tools/./build_tool'" ~/.zshrc
     then
         echo "ybb command already exists in ~/.zshrc"
     else
         echo "ybb command does not exist... adding to ~/.zshrc"
         echo "alias ybb='~/yb_tools/./build_tool'" >> ~/.zshrc
+    fi
+
+    # adding route to ingress alias
+    if grep -R "alias yb='sh ~/yb_tools/ingress.sh'" ~/.zshrc
+    then
+        echo "yb command already exists in ~/.zshrc"
+    else
+        echo "yb command does not exist... adding to ~/.zshrc"
+        echo "alias yb='sh ~/yb_tools/ingress.sh'" >> ~/.zshrc
     fi 
 fi
 
 if [ -f ~/.bashrc ] 
 then 
+    # adding direct build alias
     if grep -R "alias ybb='~/yb_tools/./build_tool'" ~/.bashrc
     then
         echo "ybb command already exists in ~/.bashrc"
     else
         echo "ybb command does not exist... adding to ~/.bashrc"
         echo "alias ybb='~/yb_tools/./build_tool'" >> ~/.bashrc
+    fi
+
+    # adding route to ingress alias
+    if grep -R "alias yb='sh ~/yb_tools/ingress.sh'" ~/.bashrc
+    then
+        echo "yb command already exists in ~/.bashrc"
+    else
+        echo "yb command does not exist... adding to ~/.bashrc"
+        echo "alias yb='sh ~/yb_tools/ingress.sh'" >> ~/.bashrc
     fi 
 fi
 
 if [ -f ~/.profile ] 
 then 
+    # adding direct build alias
     if grep -R "alias ybb='~/yb_tools/./build_tool'" ~/.profile
     then
         echo "ybb command already exists in ~/.profile"
     else
         echo "ybb command does not exist... adding to ~/.profile"
         echo "alias ybb='~/yb_tools/./build_tool'" >> ~/.profile
-    fi 
+    fi
+
+    # adding route to ingress alias
+    if grep -R "alias yb='sh ~/yb_tools/ingress.sh'" ~/.profile
+    then
+        echo "yb command already exists in ~/.profile"
+    else
+        echo "yb command does not exist... adding to ~/.profile"
+        echo "alias yb='sh ~/yb_tools/ingress.sh'" >> ~/.profile
+    fi  
 fi
