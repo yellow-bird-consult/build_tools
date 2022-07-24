@@ -7,7 +7,7 @@ then
 fi
 
 # creates a directory for database management
-if [ $2 == "init" ]
+if [ $2 = "init" ]
 then 
     if [ -d ./database_management ]
     then
@@ -24,7 +24,7 @@ then
 fi
 
 # exits the script if the database URL is not in the environment variables
-if [[ -z "${DB_URL}" ]] 
+if [ -z "${DB_URL}" ] 
 then
   echo "environment variable DB_URL is not defined"
   exit 1
