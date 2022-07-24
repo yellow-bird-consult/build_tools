@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 # work out the platform this is running on
-if [ "$(uname)" == "Darwin" ] && [ "$(uname -m)" == "arm64" ]
+if [ "$(uname)" = "Darwin" ] && [ "$(uname -m)" = "arm64" ]
 then
     echo "Apple M1 detected"
     PLATFORM="M1"
-elif [ "$(uname)" == "Darwin" ] && [ "$(uname -m)" == "x86_64" ]
+elif [ "$(uname)" = "Darwin" ] && [ "$(uname -m)" = "x86_64" ]
 then
     echo "Apple Intel detected"
     PLATFORM="AppleIntel"
@@ -31,15 +31,15 @@ then
 fi
 
 # pull static binary
-if [ $PLATFORM == "M1" ]
+if [ $PLATFORM = "M1" ]
 then
     wget https://github.com/yellow-bird-consult/build_tools/raw/develop/releases/build_tools_aarch64_apple_darwin
     mv build_tools_aarch64_apple_darwin ~/yb_tools/build_tool
-elif [ $PLATFORM == "Linux" ]
+elif [ $PLATFORM = "Linux" ]
 then
     wget https://github.com/yellow-bird-consult/build_tools/raw/develop/releases/build_tools_x86_64_unknown_linux_musl
     mv build_tools_x86_64_unknown_linux_musl ~/yb_tools/build_tool
-elif [ $PLATFORM == "AppleIntel" ]
+elif [ $PLATFORM = "AppleIntel" ]
 then
     wget https://github.com/yellow-bird-consult/build_tools/raw/develop/releases/build_tools_x86_64_apple_darwin
     mv build_tools_x86_64_apple_darwin ~/yb_tools/build_tool
