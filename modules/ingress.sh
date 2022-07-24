@@ -7,4 +7,7 @@ then
 elif [ $1 = "build" ]
 then
     ~/test_yb_tools/./build_tool
+elif [ $1 = "test" ]
+then
+    ~/test_yb_tools/testing.sh
 fi
