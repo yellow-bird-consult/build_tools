@@ -1,7 +1,7 @@
 CREATE TABLE users (
     id SERIAL NOT NULL PRIMARY KEY,
     username varchar(80) NOT NULL UNIQUE,
-    email varchar(120) UNIQUE,
+    email varchar(120) UNIQUE
 );
 
 

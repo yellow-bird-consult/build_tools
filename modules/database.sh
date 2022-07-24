@@ -6,8 +6,31 @@ then
   export $(cat .env | xargs)
 fi
 
+# creates a directory for database management
+if [ $2 == "init" ]
+then 
+    if [ -d ./database_management ]
+    then
+        echo "database_management is already present"
+        exit 0
+    else
+        mkdir ./database_management
+        mkdir ./database_management/1
+        touch ./database_management/1/up.sql
+        touch ./database_management/1/down.sql
+        echo "created database_management directory for managing migrations"
+        exit 0
+    fi
+fi
+
+# exits the script if the database URL is not in the environment variables
+if [[ -z "${DB_URL}" ]] 
+then
+  echo "environment variable DB_URL is not defined"
+  exit 1
+fi
+
 # swap all : and @ in the URL for /
-DB_URL="postgres://user:password@localhost:5433/admin"
 URL=$(echo ${DB_URL} | tr "(:|@)" "/")
 
 # split the url into an array with / as the delimiter
@@ -47,6 +70,12 @@ then
     echo "making run on database"
     TABLE_ALTER_QUERY="UPDATE migrations_version SET version = version + 1 WHERE id = 1;"
 
+    if [ $VERSION_NUMBER == "-1" ]
+    then
+        echo "database version table is not present you need to run 'yb db set' first to create the table"
+        exit 1
+    fi
+
     for file in ./database_management/*
     do
         echo "${file}/up.sql"
@@ -57,6 +86,11 @@ then
 # moves the database down a version
 elif [ $2 == "down" ]
 then 
+    if [ $VERSION_NUMBER == "-1" ]
+    then
+        echo "database version table is not present you need to run 'yb db set' first to create the table"
+        exit 1
+    fi
     TABLE_ALTER_QUERY="UPDATE migrations_version SET version = version - 1 WHERE id = 1;"
     echo "running down script in version $VERSION_NUMBER"
     echo "./database_management/${NEW_NUMBER}/down.sql"
@@ -66,6 +100,11 @@ then
 # moves the database up a version
 elif [ $2 == "up" ]
 then 
+    if [ $VERSION_NUMBER == "-1" ]
+    then
+        echo "database version table is not present you need to run 'yb db set' first to create the table"
+        exit 1
+    fi
     NEW_NUMBER=$(expr $VERSION_NUMBER + 1)
     TABLE_ALTER_QUERY="UPDATE migrations_version SET version = version + 1 WHERE id = 1;"
     echo "running up script in version $NEW_NUMBER"
@@ -85,23 +124,14 @@ then
         echo "migrations_version has been created"
     fi
 
-# creates a directory for database management
-elif [ $2 == "init" ]
-then 
-    if [ -d ./database_management ]
-    then
-        echo "database_management is already present"
-    else
-        mkdir ./database_management
-        mkdir ./database_management/1
-        touch ./database_management/1/up.sql
-        touch ./database_management/1/down.sql
-        echo "created database_management directory for managing migrations"
-    fi
-
 # creates a new migration directory with the latest version
 elif [ $2 == "new" ]
 then
+    if [ $VERSION_NUMBER == "-1" ]
+    then
+        echo "database version table is not present you need to run 'yb db set' first to create the table"
+        exit 1
+    fi
     NEW_NUMBER=$(expr $VERSION_NUMBER + 1)
     if [ -d ./database_management/$NEW_NUMBER ]
     then
