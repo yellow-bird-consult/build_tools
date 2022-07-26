@@ -144,4 +144,33 @@ then
         touch ./database_management/$NEW_NUMBER/down.sql
         echo "created version ${NEW_NUMBER}"
     fi
+
+elif [ $2 == "rollup" ]
+then
+    # create the version table if not there
+    if [ $VERSION_PRESENT == "t" ]
+    then
+        echo "migrations_version table is already present"
+    else
+        TABLE_CREATION_QUERY="CREATE TABLE migrations_version (id int NOT NULL PRIMARY KEY, version integer); INSERT INTO migrations_version(version, id) VALUES (0, 1);"
+        PGPASSWORD=$(echo $PASSWORD) psql -h $HOST -U $USER -d $DB -p $PORT -t -c "${TABLE_CREATION_QUERY}"
+        echo "migrations_version has been created"
+    fi
+
+    TABLE_ALTER_QUERY="UPDATE migrations_version SET version = version + 1 WHERE id = 1;"
+    
+    cd database_management
+    for file in *
+    do
+        # NEW_NUMBER=$(expr $VERSION_NUMBER + 1)
+        # echo "${file}/up.sql"
+        if [[ $file -gt $VERSION_NUMBER ]]
+        then 
+            # echo "${file}/up.sql"
+            PGPASSWORD=$(echo $PASSWORD) psql -h $HOST -U $USER -d $DB -p $PORT -a -q -f "${file}/up.sql"
+            PGPASSWORD=$(echo $PASSWORD) psql -h $HOST -U $USER -d $DB -p $PORT -t -c "${TABLE_ALTER_QUERY}"
+        fi
+        # PGPASSWORD=$(echo $PASSWORD) psql -h $HOST -U $USER -d $DB -p $PORT -a -q -f "${file}/up.sql"
+        # PGPASSWORD=$(echo $PASSWORD) psql -h $HOST -U $USER -d $DB -p $PORT -t -c "${TABLE_ALTER_QUERY}"
+    done
 fi
