@@ -145,6 +145,7 @@ then
         echo "created version ${NEW_NUMBER}"
     fi
 
+# creates migration table if not present and rolls on with all 
 elif [ $2 == "rollup" ]
 then
     # create the version table if not there
@@ -162,15 +163,11 @@ then
     cd database_management
     for file in *
     do
-        # NEW_NUMBER=$(expr $VERSION_NUMBER + 1)
-        # echo "${file}/up.sql"
         if [[ $file -gt $VERSION_NUMBER ]]
         then 
             # echo "${file}/up.sql"
             PGPASSWORD=$(echo $PASSWORD) psql -h $HOST -U $USER -d $DB -p $PORT -a -q -f "${file}/up.sql"
             PGPASSWORD=$(echo $PASSWORD) psql -h $HOST -U $USER -d $DB -p $PORT -t -c "${TABLE_ALTER_QUERY}"
         fi
-        # PGPASSWORD=$(echo $PASSWORD) psql -h $HOST -U $USER -d $DB -p $PORT -a -q -f "${file}/up.sql"
-        # PGPASSWORD=$(echo $PASSWORD) psql -h $HOST -U $USER -d $DB -p $PORT -t -c "${TABLE_ALTER_QUERY}"
     done
 fi
