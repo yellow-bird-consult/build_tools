@@ -12,5 +12,5 @@ then
     source ~/yb_tools/testing.sh
 elif [ $1 = "run" ]
 then
-    ~/yb_tools/run_dev_server.sh
+    source ~/yb_tools/run_dev_server.sh
 fi
