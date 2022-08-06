@@ -69,6 +69,10 @@ mv ingress.sh ~/yb_tools/ingress.sh
 mv database.sh ~/yb_tools/database.sh
 mv testing.sh ~/yb_tools/testing.sh
 mv run_dev_server.sh ~/yb_tools/run_dev_server.sh
+chmod u+x ~/yb_tools/ingress.sh
+chmod u+x ~/yb_tools/database.sh
+chmod u+x ~/yb_tools/testing.sh
+chmod u+x ~/yb_tools/run_dev_server.sh
 echo "ingress bash module installed"
 echo "database bash module installed"
 echo "testing bash module installed"
