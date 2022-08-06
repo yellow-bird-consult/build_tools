@@ -19,6 +19,6 @@ jobs:
         uses: test-room-7/action-update-file@v1
         with:
             file-path: |
-                ./releases/build_tools_x86_64_unknown_linux_musl
+                releases/build_tools_x86_64_unknown_linux_musl
             commit-msg: Update resources
             github-token: ${{ secrets.ACCESS_TOKEN }}
