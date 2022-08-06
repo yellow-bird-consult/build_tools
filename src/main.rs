@@ -4,5 +4,5 @@
 
 
 fn  main() {
-    println!("Hello deployment from Rust!");
+    println!("Hello deployment from Rust using github actions!");
 }

@@ -61,12 +61,15 @@ fi
 # pull bash ingress and modules
 wget https://github.com/yellow-bird-consult/build_tools/raw/develop/modules/ingress.sh
 wget https://github.com/yellow-bird-consult/build_tools/raw/develop/modules/database.sh
+wget https://github.com/yellow-bird-consult/build_tools/raw/develop/modules/testing.sh
 
 # move bash ingress and modules to yb_tools
 mv ingress.sh ~/yb_tools/ingress.sh
 mv database.sh ~/yb_tools/database.sh
+mv testing.sh ~/yb_tools/testing.sh
 echo "ingress bash module installed"
 echo "database bash module installed"
+echo "testing bash module installed"
 
 # update the permissions of the static binary
 chmod 755 ~/yb_tools/build_tool

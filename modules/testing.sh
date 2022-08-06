@@ -21,3 +21,55 @@ then
     fi
 fi
 
+if [ $2 = "local" ]
+then
+    cp ./platforms/local ./docker-compose.yml
+fi
+
+if [ $2 = "deployment" ]
+then
+    cp ./platforms/deployment ./docker-compose.yml
+fi
+
+if [ $2 = "cleanup" ]
+then
+    rm ./docker-compose.yml
+fi
+
+
+
+if [ $2 = "integration" ]
+then
+    # fetch the right build depending on chip
+    if [ "$(uname -m)" = "arm64" ]
+    then
+        cp ./builds/arch_build ./Dockerfile
+        cp ./tests/platforms/local ./tests/docker-compose.yml
+    else
+        cp ./builds/server_build ./Dockerfile
+        cp ./tests/platforms/deployment ./tests/docker-compose.yml
+    fi
+    cd tests 
+
+    if [ $3 = "local" ]
+    then 
+        cp ./platforms/local ./docker-compose.yml
+    else
+        cp ./platforms/deployment ./docker-compose.yml
+    fi
+
+    # build the 
+    docker-compose build --no-cache
+    docker-compose up -d
+
+    # wait until rust server is running
+    sleep 5
+
+    # run the api tests
+    newman run $4.postman_collection.json
+
+    # cleanup containers
+    docker-compose down
+    rm ../Dockerfile
+    rm docker-compose.yml
+fi
