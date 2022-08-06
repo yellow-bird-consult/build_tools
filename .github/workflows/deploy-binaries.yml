@@ -15,10 +15,13 @@ jobs:
         run: |
           cargo build --release
           cp ./target/release/build_tools ./releases/build_tools_x86_64_unknown_linux_musl
-      - name: Update resources
-        uses: test-room-7/action-update-file@v1
-        with:
-            file-path: |
-                releases/build_tools_x86_64_unknown_linux_musl
-            commit-msg: Update resources
-            github-token: ${{ secrets.ACCESS_TOKEN }}
+          git add -A
+          git commit -m "adding linux binary"
+          git push
+      # - name: Update resources
+      #   uses: test-room-7/action-update-file@v1
+      #   with:
+      #       file-path: |
+      #           releases/build_tools_x86_64_unknown_linux_musl
+      #       commit-msg: Update resources
+      #       github-token: ${{ secrets.ACCESS_TOKEN }}
