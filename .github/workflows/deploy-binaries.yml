@@ -1,25 +1,25 @@
-name: deploy binaries
+# name: deploy binaries
 
-on: [pull_request]
+# on: [pull_request]
 
-jobs:
-  run-unit-tests:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-      - name: run cross compilation build
-        run: |
-          cargo build --release
-          cp ./target/release/build_tools ./releases/build_tools_x86_64_unknown_linux_musl
-          git config --global user.email "maxwellflitton@gmail.com"
-          git config --global user.name "maxwellflitton"
-          git add -A
-          git commit -m "adding linux binary"
-          git push origin ${{ github.ref_name }}
+# jobs:
+#   run-unit-tests:
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 10
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: actions-rs/toolchain@v1
+#         with:
+#           toolchain: stable
+#       - name: run cross compilation build
+#         run: |
+#           cargo build --release
+#           cp ./target/release/build_tools ./releases/build_tools_x86_64_unknown_linux_musl
+#           git config --global user.email "maxwellflitton@gmail.com"
+#           git config --global user.name "maxwellflitton"
+#           git add -A
+#           git commit -m "adding linux binary"
+#           git push origin ${{ github.ref_name }}
       # - name: Update resources
       #   uses: test-room-7/action-update-file@v1
       #   with:
