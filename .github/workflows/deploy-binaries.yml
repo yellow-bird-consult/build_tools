@@ -19,7 +19,7 @@ jobs:
           git config --global user.name "maxwellflitton"
           git add -A
           git commit -m "adding linux binary"
-          git push
+          git push origin ${{ github.ref_name }}
       # - name: Update resources
       #   uses: test-room-7/action-update-file@v1
       #   with:
