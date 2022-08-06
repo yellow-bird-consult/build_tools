@@ -27,6 +27,34 @@ bash ~/yb_tools/database.sh db get
 Each bash script module is completely isolated so feel free to pull them around and use them as you see
 fit.
 
+## Running a Rust dev server
+
+To run a Rust dev server you need to navigate to the directory where your ```Cargo.toml``` file is. This tool assumes that
+you use environment variables to configure your server or any Rust application in debug mode. Because of the environment
+variable assumption, you will need an ```.env``` file in the same directory as your ```Cargo.toml``` file. For our example
+our ```.env``` file takes the following form:
+
+```.env
+DB_URL="postgres://username:password@localhost:5433/auth"
+SECRET_KEY="secret"
+EXPIRE_MINUTES="60"
+ORG_EMAIL="@yellowbirdconsulting.co.uk"
+PRODUCTION="false"
+```
+
+We can see that we have defined a basic set of parameters for a toy dev server. We can then run our server with the
+following command:
+
+```bash
+# with alias
+yb run
+
+# without alias
+bash ~/test_yb_tools/run_dev_server.sh run
+```
+
+The parameters from the ```.env``` file will be exported into the server run.
+
 ## Database migrations
 
 Build tools manages database migrations. However, before we go further we must explain what the motivation is behind this tool
@@ -185,3 +213,55 @@ bash ~/yb_tools/database.sh db down
 ```
 
 And with this we have executed all of the commands needed to manage migrations.
+
+### Building an init container
+
+You may want to build an init container for your migrations. You can do this by writing a ```Dockerfile``` right next to your
+```.env``` file with the following content:
+
+```Dockerfile
+FROM postgres 
+
+RUN apt-get update \
+  && apt-get install -y wget \
+  && wget -O - https://raw.githubusercontent.com/yellow-bird-consult/build_tools/develop/scripts/install.sh | bash \
+  && cp ~/yb_tools/database.sh ./database.sh
+
+WORKDIR .
+ADD . .
+
+CMD ["bash", "./database.sh", "db", "rollup"]
+```
+
+We can see that we inherit from the ```postgres``` image, install ```wget```, then install our light weight build tools,
+and move our ```database.sh``` file into the root directory. We then copy over our ```data_management``` directory with
+all of our SQL files and our command entry point is the ```rollup``` which means that the migration is run and then
+the container is finished. We must remember to define a ```.dockerignore``` file in the same directory for avoid the
+```.env``` file being copied over into the image. We will need to pass environment variables either through docker compose
+or Kubernetes so we do not want the ```.env``` file overwriting the variables we pass into the container. Our ```.dockerignore``` file
+should take the following form:
+
+```.dockerignore
+.env
+```
+
+We can now use our image in a docker-compose to run migrations on a local database with the following code:
+
+```yml
+init_test_auth_db:
+    container_name: init_test
+    image: init_test
+    build: 
+      context: ../database
+    environment:
+      - 'DB_URL=postgres://username:password@test_postgres:5432/auth'
+    depends_on:
+        test_postgres:
+          condition: service_started
+    restart: on-failure
+```
+
+Here we tag an image but we point to where our migrations ```Dockerfile``` is the with ```context``` tag. We then pass in the
+environment variable of the ```DB_URL``` for the migrations to be applied. We make sure that the database has spun up before
+we run our init container. There might be a lag in the database accepting connections so we tell the container to restart
+on failure meaning our init container will keep trying until it gets a connection with the database and runs the migration.
