@@ -59,6 +59,8 @@ cp modules/database.sh ~/test_yb_tools/database.sh
 echo "added db module"
 cp modules/testing.sh ~/test_yb_tools/testing.sh
 echo "added testing module"
+cp modules/run_dev_server.sh ~/test_yb_tools/run_dev_server.sh
+echo "added run dev server module"
 
 # update the permissions of the static binary
 chmod 755 ~/test_yb_tools/build_tool
