@@ -14,7 +14,6 @@ jobs:
       - name: run cross compilation build
         run: |
           cargo build --release
-          sudo rm ./releases/build_tools_x86_64_unknown_linux_musl
           cp ./target/release/build_tools ./releases/build_tools_x86_64_unknown_linux_musl
       - name: Update resources
         uses: test-room-7/action-update-file@v1
