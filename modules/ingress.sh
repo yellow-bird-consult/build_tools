@@ -9,7 +9,7 @@ then
     ~/yb_tools/./build_tool
 elif [ $1 = "test" ]
 then
-    ~/yb_tools/testing.sh
+    source ~/yb_tools/testing.sh
 elif [ $1 = "run" ]
 then
     ~/yb_tools/run_dev_server.sh

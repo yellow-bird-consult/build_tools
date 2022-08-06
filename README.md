@@ -265,3 +265,31 @@ Here we tag an image but we point to where our migrations ```Dockerfile``` is th
 environment variable of the ```DB_URL``` for the migrations to be applied. We make sure that the database has spun up before
 we run our init container. There might be a lag in the database accepting connections so we tell the container to restart
 on failure meaning our init container will keep trying until it gets a connection with the database and runs the migration.
+
+## Reference commands for a Yellow Bird Rust server
+
+Below are some short reference commands to run dev server and test it.
+
+### Run full integration tests
+
+Navigate to the root directory where the ```tests``` and ```builds``` directory is and run the following:
+
+```bash
+# With alias
+yb test integration local <name_of_postman_collection_prefix> 
+
+# Without alias
+sh ~/yb_tools/testing.sh test integration local <name_of_postman_collection_prefix> 
+```
+
+### Run dev server
+
+Navigate to where there ```Cargo.toml``` file and ```.env``` file is and run the following command:
+
+```bash
+# With alias
+yb run 
+
+# Without alias
+sh ~/yb_tools/run_dev_server.sh
+```
