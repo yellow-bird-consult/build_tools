@@ -15,6 +15,8 @@ jobs:
         run: |
           cargo build --release
           cp ./target/release/build_tools ./releases/build_tools_x86_64_unknown_linux_musl
+          git config --global user.email "maxwellflitton@gmail.com"
+          git config --global user.name "maxwellflitton"
           git add -A
           git commit -m "adding linux binary"
           git push
