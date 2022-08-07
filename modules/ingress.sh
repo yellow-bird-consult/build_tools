@@ -13,4 +13,7 @@ then
 elif [ $1 = "run" ]
 then
     source ~/yb_tools/run_dev_server.sh
+elif [ $1 = "service" ]
+then
+    source ~/yb_tools/services.sh
 fi

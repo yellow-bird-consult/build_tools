@@ -63,20 +63,24 @@ wget -q https://github.com/yellow-bird-consult/build_tools/raw/develop/modules/i
 wget -q https://github.com/yellow-bird-consult/build_tools/raw/develop/modules/database.sh
 wget -q https://github.com/yellow-bird-consult/build_tools/raw/develop/modules/testing.sh
 wget -q https://github.com/yellow-bird-consult/build_tools/raw/develop/modules/run_dev_server.sh
+wget -q https://github.com/yellow-bird-consult/build_tools/raw/develop/modules/services.sh
 
 # move bash ingress and modules to yb_tools
 mv ingress.sh ~/yb_tools/ingress.sh
 mv database.sh ~/yb_tools/database.sh
 mv testing.sh ~/yb_tools/testing.sh
 mv run_dev_server.sh ~/yb_tools/run_dev_server.sh
+mv services.sh ~/yb_tools/services.sh
 chmod u+x ~/yb_tools/ingress.sh
 chmod u+x ~/yb_tools/database.sh
 chmod u+x ~/yb_tools/testing.sh
 chmod u+x ~/yb_tools/run_dev_server.sh
+chmod u+x ~/yb_tools/services.sh
 echo "ingress bash module installed"
 echo "database bash module installed"
 echo "testing bash module installed"
 echo "run dev server bash module installed"
+echo "services bash module installed"
 
 # update the permissions of the static binary
 chmod 755 ~/yb_tools/build_tool
