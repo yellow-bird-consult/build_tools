@@ -58,7 +58,7 @@ then
         cp ./platforms/deployment ./docker-compose.yml
     fi
 
-    # build the 
+    # build the system supporting the tests
     docker-compose build --no-cache
     docker-compose up -d
 
@@ -72,4 +72,10 @@ then
     docker-compose down
     rm ../Dockerfile
     rm docker-compose.yml
+
+    if [ -d ./builds ]
+    then
+        rm -rf builds
+        mkdir builds
+    fi
 fi
