@@ -72,10 +72,4 @@ then
     docker-compose down
     rm ../Dockerfile
     rm docker-compose.yml
-
-    if [ -d ./builds ]
-    then
-        rm -rf builds
-        mkdir builds
-    fi
 fi

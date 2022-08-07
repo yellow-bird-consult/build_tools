@@ -23,3 +23,7 @@ then
     rm -rf ./services
     mkdir ./services
 fi
+
+# Add a refresh 
+# Add a switch branch
+# add an ls
