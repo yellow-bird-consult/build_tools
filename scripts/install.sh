@@ -59,10 +59,10 @@ then
 fi  
 
 # pull bash ingress and modules
-wget https://github.com/yellow-bird-consult/build_tools/raw/develop/modules/ingress.sh
-wget https://github.com/yellow-bird-consult/build_tools/raw/develop/modules/database.sh
-wget https://github.com/yellow-bird-consult/build_tools/raw/develop/modules/testing.sh
-wget https://github.com/yellow-bird-consult/build_tools/raw/develop/modules/run_dev_server.sh
+wget -q https://github.com/yellow-bird-consult/build_tools/raw/develop/modules/ingress.sh
+wget -q https://github.com/yellow-bird-consult/build_tools/raw/develop/modules/database.sh
+wget -q https://github.com/yellow-bird-consult/build_tools/raw/develop/modules/testing.sh
+wget -q https://github.com/yellow-bird-consult/build_tools/raw/develop/modules/run_dev_server.sh
 
 # move bash ingress and modules to yb_tools
 mv ingress.sh ~/yb_tools/ingress.sh
